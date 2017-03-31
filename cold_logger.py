@@ -40,7 +40,7 @@ class ColdLoggerMeasure(Measurement):
                 
                 f.write("{}, {}, {}\n".format(t1, temp, curr))
                 
-                time.sleep(0.8)
+                time.sleep(0.5)
             
             
     def update_display(self):

@@ -35,7 +35,7 @@ class ColdController(object):
         
         self.ser = serial.Serial(port=self.port, baudrate=BaudRate, bytesize=DataBits, stopbits=StopBits, timeout=5.0)     
         self.ser.flush()
-        time.sleep(0.2)
+        time.sleep(0.5)
         
     def _readline(self):
         eol = b'\r\n\r\n' #controller end of line format
@@ -58,97 +58,96 @@ class ColdController(object):
         self.ser.flush()
         self.ser.flushInput()
         #self.ser.flushOutput()
-        time.sleep(.1)
+        time.sleep(.25)
         self.ser.write(bytes('*' + comm + '\n', 'ascii'))
         output = self._readline()
-        time.sleep(.1)
-        self.ser.flush()
+        time.sleep(.25)
+        #self.ser.flush()
         #self.ser.flushInput()
-        self.ser.flushOutput()
+        #self.ser.flushOutput()
         return output
     
-    def FloatErrorHandler(self,dat,errdat):
-        try:
-            mess = dat.decode()
-            mess = float(mess)
-            return mess
-        except ValueError:
-            print("ValueError")
-            return(errdat)
-        
-    def StringErrorHandler(self,dat,errdat):
-        try:
-            mess = dat.decode()
-            mess = str(mess)[:-4]
-            return mess
-        except ValueError:
-            print("ValueError")
-            return(errdat)
-    
-    def PrintErrorHandler(self,dat):
-        try:
-            mess = dat.decode()
-            print(mess)
-        except ValueError:
-            print("ValueError")
-            print(dat) 
-
     def Hi(self):
         out=self.Communicator('Hi')
-        self.PrintErrorHandler(out)
+        print(out)
         
     def SetTime(self,HH,MM,SS):
         out=self.Communicator('SetTime '  + HH + ":" + MM + ":" + SS)
-        self.PrintErrorHandler(out)
+        print(out)
         
     def SetTimeCurrent(self):
         time.strftime('%H:%M:%S', time.localtime())
         out=self.Communicator('SetTime '  + time.strftime('%H:%M:%S', time.localtime()))
-        self.PrintErrorHandler(out)
+        print(out)
         
     def SetDate(self,MM,DD,YY):
         out=self.Communicator('SetDate ' + MM + ":" + DD + ":" + YY )
-        self.PrintErrorHandler(out)
+        print(out)
         
     def SetDateCurrent(self):
         out=self.Communicator('SetDate ' + time.strftime('%m:%d:%y', time.localtime()) )
-        self.PrintErrorHandler(out)
+        print(out)
         
     def GetTime(self):
         out=self.Communicator('GetTime')
-        self.StringErrorHandler(out, "99:99:99")
+        try:
+            return str(out)[:-4]
+        except ValueError:
+            print("Decode ValueError")
+            return "99:99:99"
     
     def GetDate(self):
         out=self.Communicator('GetDate')
-        self.StringErrorHandler(out, "99:99:99")
+        try:
+            return str(out)[:-4]
+        except ValueError:
+            print("Decode ValueError")
+            return "99:99:99"
     
     def GetTemp(self):
         out=self.Communicator('GetTemp')
-        self.FloatErrorHandler(out, 999999)
+        try:
+            return float(out)
+        except ValueError:
+            print("Decode ValueError")
+            return 9999
     
     def SetTempUnits(self,unit):
         out=self.Communicator('SetTempUnits ' + unit)
-        self.PrintErrorHandler(out)
+        print(out)
     
     def GetTempUnits(self):
         out=self.Communicator('GetTempUnits')
-        self.StringErrorHandler(out, "MEOW")
+        try:
+            return str(out)[:-4]
+        except ValueError:
+            print("Decode ValueError")
+            return "MEOW"
     
     def SetHighTemp(self,temp): #in current temp units
         out=self.Communicator('SetHighTemp ' + str(temp))
-        self.PrintErrorHandler(out)
+        print(out)
         
     def GetHighTemp(self): #in current temp units
         out=self.Communicator('GetHighTemp')
-        self.FloatErrorHandler(out, 999999)
+        try:
+            return str(out)[:-4]
+        except ValueError:
+            print("Decode ValueError")
+            return 9999
+    
     
     def SetCurrent(self,amps): #current in amps
         out=self.Communicator('SetCurrent ' + str(amps))
-        self.PrintErrorHandler(out)
+        print(out)
         
     def GetCurrent(self): #prints current in amps
         out=self.Communicator('GetCurrent')
-        self.FloatErrorHandler(out, 999999)
+        try:
+            return float(out)
+        except ValueError:
+            print("Decode ValueError")
+            return 9999
     
     def Stop(self):
         out=self.Communicator('Stop')
