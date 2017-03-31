@@ -9,21 +9,20 @@ class ColdControllerHW(HardwareComponent):
     def setup(self):
         
         #for mac
-        #devlist=[]
-        #for root, dirs, files in os.walk("/dev", topdown=False):
-        #   for name in files:
-        #       if name[0:3]=='cu.':
-        #           #if name[0:4]=='tty.':
-        #           print(os.path.join(root, name))
-        #           devlist.append(os.path.join(root, name))
+        devlist=[]
+        for root, dirs, files in os.walk("/dev", topdown=False):
+            for name in files:
+                if name[0:3]=='cu.':
+                    print(os.path.join(root, name))
+                    devlist.append(os.path.join(root, name))
                     
         #for windoes
-        devlist = ["COM8"]
+        #devlist = ["COM8"]
         
         self.settings.New('port', dtype=str, initial=devlist[-1])
         self.settings.New('temp', dtype=float, ro=True)
         self.settings.New('temp_unit', dtype=str, choices=('FAHRENHEIT', 'CENTIGRADE', 'KELVIN'), initial='CENTIGRADE')
-        self.settings.New('current', dtype=float, unit='A')
+        self.settings.New('current', dtype=float, unit='A', vmin=0.000, vmax=0.900, spinbox_decimals = 2, spinbox_step=0.01)
     
     def connect(self):
         self.dev = ColdController(comport=self.settings['port'],
